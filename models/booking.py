@@ -6,6 +6,9 @@ class Booking :
         self.__show = Show
         self.__booked_seats = []
     
+    @property
+    def show(self): return self.__show
+    
     def select_seat(self,Seat) :
         if Seat.is_reserved == False :
             Seat.reserve_seat()
@@ -17,5 +20,10 @@ class Booking :
         for seat in self.__booked_seats :
             ticket = Ticket(self.__show,seat)
             self.__user.ticket_list.append(ticket)
+
+    def cancel_booking(self):
+        for seat in self.__booked_seats:
+            seat.unreserve_seat()
+        self.__booked_seats = []
 
             
