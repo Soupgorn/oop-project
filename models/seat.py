@@ -8,5 +8,8 @@ class Seat :
     @property 
     def is_reserved (self): return self.__is_reserved
     
-    def reserve_seat (self) :
+    def reserve_seat (self) : 
         self.__is_reserved = True
+
+    def unreserve_seat(self): 
+        self.__is_reserved = False

@@ -32,6 +32,8 @@ class Cinema :
             if show_movie.movie.movie_name == movie_name :
                 found_show_time.append(show_movie.time)
         return found_show_time
+    
+
 
     
     

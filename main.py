@@ -45,9 +45,15 @@ if __name__ == "__main__":
     arm_booking2.select_seat(s1_a2)
     arm_booking2.confirm_booking()
 
+
+
     print(f"User: {arm.username} has {len(arm.ticket_list)} ticket(s).")
 
     yo = cinema.search_movie_time_by_movie_name("Fast & Furious X")
 
     for i in yo :
         print(i)
+
+    arm.cancel_booking_by_show(show1, arm_booking1)
+    
+    print(f"User: {arm.username} has {len(arm.ticket_list)} ticket(s).")
