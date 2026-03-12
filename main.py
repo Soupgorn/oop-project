@@ -291,3 +291,4 @@ if __name__ == "__main__":
         user = screen_login(cinema)
         if user:
             screen_shows(cinema, user)
+            
