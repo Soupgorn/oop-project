@@ -53,18 +53,73 @@ def setup_cinema():#Setup Cinema
 
 def screen_login(cinema): #Login
     while True:
-        print_header("LOGIN")
-        username = input("\n  Username : ")
-        password = input("  Password : ")
+        print_header("WELCOME")
+        print("\n  1  Login")
+        print("  2  Register")
+        print("  0  Quit")
+        print()
 
-        user = cinema.search_user_by_username(username)
-        if user and password == user._User__password:
-            print(f"\n  Welcome, {username}!")
-            input("  (press Enter to continue)")
-            return user
+        choice = input("  Choose : ").strip()
+
+        if choice == "0":
+            return None
+        elif choice == "1":
+            user = do_login(cinema)
+            if user:
+                return user
+        elif choice == "2":
+            do_register(cinema)
         else:
-            print("\n  Invalid username or password")
-            input("  (press Enter to try again)")
+            print("\n  Invalid choice")
+            input("  (press Enter)")
+
+
+def do_login(cinema):#Login Process
+    print_header("LOGIN")
+    username = input("\n  Username : ")
+    password = input("  Password : ")
+
+    user = cinema.search_user_by_username(username)
+    if user and password == user.password:
+        print(f"\n  Welcome, {username}!")
+        input("  (press Enter to continue)")
+        return user
+    else:
+        print("\n  Invalid username or password")
+        input("  (press Enter to try again)")
+        return None
+
+
+def do_register(cinema):#Register Process
+    print_header("REGISTER")
+    username = input("\n  Username : ").strip()
+
+    if not username:
+        print("\n  Username cannot be empty")
+        input("  (press Enter)")
+        return
+
+    if cinema.search_user_by_username(username):
+        print(f"\n  Username '{username}' is already taken")
+        input("  (press Enter)")
+        return
+
+    password = input("  Password : ").strip()
+    if not password:
+        print("\n  Password cannot be empty")
+        input("  (press Enter)")
+        return
+
+    confirm = input("  Confirm Password : ").strip()
+    if password != confirm:
+        print("\n  Passwords do not match")
+        input("  (press Enter)")
+        return
+
+    new_user = User(username, password)
+    cinema.add_user(new_user)
+    print(f"\n  Account created! Welcome, {username}!")
+    input("  (press Enter to login)")
 
 
 def screen_shows(cinema, user): #Shows
