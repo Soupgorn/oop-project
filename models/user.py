@@ -1,5 +1,5 @@
 class User :
-    def __init__(self,username,password,Ticket = None):
+    def __init__(self,username,password):
         self.__username = username
         self.__password = password
         self.__ticket_List = []
