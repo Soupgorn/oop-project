@@ -14,7 +14,7 @@ class Booking:
 
     @booked_seats.setter
     def booked_seats(self, value):
-        self._booked_seats = value
+        self.__booked_seats = value
 
 
     def select_seat(self, Seat):
