@@ -176,7 +176,7 @@ def screen_seats(user, show):#Seats Choosing
             for s in rows[row_letter]:
                 if s.is_reserved:
                     print("[X]", end=" ")
-                elif s._Seat__seat_type == "VIP":
+                elif s.seat_type == "VIP":
                     print("[V]", end=" ")
                 else:
                     print("[ ]", end=" ")
@@ -207,7 +207,7 @@ def screen_seats(user, show):#Seats Choosing
         failed  = []
 
         for name in seat_names:
-            found = next((s for s in seats if s._Seat__seat_no == name), None)
+            found = next((s for s in seats if s.seat_no == name), None)
             if not found:
                 failed.append(f"{name} (not found)")
             else:
@@ -254,9 +254,9 @@ def screen_my_tickets(user):#User's Tickets
         print(f"\n  {'No.':<5} {'Time':<8} {'Movie':<26} {'Seat':<8} {'Type'}")
         print("  " + "-" * 55)
         for i, t in enumerate(tickets):
-            seat = t._Ticket__seat
+            seat = t.seat
             show = t.show
-            print(f"  {i+1:<5} {show.time:<8} {show.movie.movie_name:<26} {seat._Seat__seat_no:<8} {seat._Seat__seat_type}")
+            print(f"  {i+1:<5} {show.time:<8} {show.movie.movie_name:<26} {seat.seat_no:<8} {seat.seat_type}")
 
         print("\n  " + "-" * 55)
         print("  Enter ticket number to cancel, or 0 to go back")
@@ -268,13 +268,13 @@ def screen_my_tickets(user):#User's Tickets
             return
         elif choice.isdigit() and 1 <= int(choice) <= len(tickets):
             t = tickets[int(choice) - 1]
-            seat = t._Ticket__seat
+            seat = t.seat
             show = t.show
             print(f"\n  Cancel: {show.movie.movie_name} @ {show.time} | Seat {seat._Seat__seat_no}")
             confirm = input("  Are you sure? (y/n) : ").strip().lower()
             if confirm == "y":
                 booking = Booking(user, show)
-                booking._Booking__booked_seats = [seat]
+                booking.booked_seats = [seat]
                 user.cancel_booking_by_show(show, booking)
                 print("  Ticket cancelled.")
             else:

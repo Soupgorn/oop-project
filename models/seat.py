@@ -8,6 +8,12 @@ class Seat :
     @property 
     def is_reserved (self): return self.__is_reserved
     
+    @property
+    def seat_no (self) : return self.__seat_no
+
+    @property 
+    def seat_type (self) : return self.__seat_type
+    
     def reserve_seat (self) : 
         self.__is_reserved = True
 

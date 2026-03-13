@@ -10,7 +10,12 @@ class Booking:
     def show(self): return self.__show
 
     @property
-    def booked_seats(self): return self.__booked_seats
+    def booked_seats(self): return self.__booked_seats  
+
+    @booked_seats.setter
+    def booked_seats(self, value):
+        self._booked_seats = value
+
 
     def select_seat(self, Seat):
         if Seat.is_reserved:
