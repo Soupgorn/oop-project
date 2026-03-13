@@ -4,3 +4,6 @@ class Ticket :
         self.__seat = Seat
     @property
     def show(self): return self.__show
+
+    @property
+    def seat(self): return self.__seat

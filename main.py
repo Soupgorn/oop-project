@@ -7,7 +7,7 @@ def print_header(title):
     print("=" * 50)
 
 
-def setup_cinema():#Setup Cinema
+def setup_cinema():
     cinema = Cinema("SF Cinema")
 
     fast10   = Movie("Fast & Furious X", "Action")
@@ -42,16 +42,21 @@ def setup_cinema():#Setup Cinema
 
     arm = User("armlnwza007", "1234")
     jet = User("jetlnwza007", "5678")
-    law = User("why.law","1234")
+    law = User("why.law", "1234")
+    admin = User("admin", "admin")
     cinema.add_user(arm)
     cinema.add_user(jet)
     cinema.add_user(law)
+    cinema.add_user(admin)
 
     cinema._shows = [show1, show2, show3, show4]
+    cinema._admins = {"admin"}
     return cinema
 
 
-def screen_login(cinema): #Login
+# ── Login / Register ──────────────────────────────────────────────────────────
+
+def screen_login(cinema):
     while True:
         print_header("WELCOME")
         print("\n  1  Login")
@@ -74,7 +79,7 @@ def screen_login(cinema): #Login
             input("  (press Enter)")
 
 
-def do_login(cinema):#Login Process
+def do_login(cinema):
     print_header("LOGIN")
     username = input("\n  Username : ")
     password = input("  Password : ")
@@ -90,7 +95,7 @@ def do_login(cinema):#Login Process
         return None
 
 
-def do_register(cinema):#Register Process
+def do_register(cinema):
     print_header("REGISTER")
     username = input("\n  Username : ").strip()
 
@@ -122,7 +127,134 @@ def do_register(cinema):#Register Process
     input("  (press Enter to login)")
 
 
-def screen_shows(cinema, user): #Shows
+# ── Admin ─────────────────────────────────────────────────────────────────────
+
+def screen_admin(cinema):
+    while True:
+        print_header("ADMIN PANEL")
+        print("\n  1  Add movie")
+        print("  2  Add show")
+        print("  3  Search movie by genre")
+        print("  4  Search showtime by movie name")
+        print("  0  Logout")
+        print()
+
+        choice = input("  Choose : ").strip()
+
+        if choice == "0":
+            return
+        elif choice == "1":
+            do_add_movie(cinema)
+        elif choice == "2":
+            do_add_show(cinema)
+        elif choice == "3":
+            do_search_by_genre(cinema)
+        elif choice == "4":
+            do_search_by_name(cinema)
+        else:
+            print("\n  Invalid choice")
+            input("  (press Enter)")
+
+
+def do_add_movie(cinema):
+    print_header("ADD MOVIE")
+    name = input("\n  Movie name : ").strip()
+    if not name:
+        print("\n  Name cannot be empty")
+        input("  (press Enter)")
+        return
+    genre = input("  Genre      : ").strip()
+    if not genre:
+        print("\n  Genre cannot be empty")
+        input("  (press Enter)")
+        return
+    cinema.add_movie(Movie(name, genre))
+    print(f"\n  Movie '{name}' added!")
+    input("  (press Enter)")
+
+
+def do_add_show(cinema):
+    print_header("ADD SHOW")
+    movies = cinema.movie_list
+    if not movies:
+        print("\n  No movies in system. Add a movie first.")
+        input("  (press Enter)")
+        return
+
+    print()
+    for i, m in enumerate(movies):
+        print(f"  {i+1}  {m.movie_name} ({m.movie_type})")
+    print()
+
+    choice = input("  Select movie No. : ").strip()
+    if not choice.isdigit() or not (1 <= int(choice) <= len(movies)):
+        print("\n  Invalid choice")
+        input("  (press Enter)")
+        return
+
+    movie = movies[int(choice) - 1]
+    time = input("  Showtime (e.g. 14:00) : ").strip()
+    if not time:
+        print("\n  Time cannot be empty")
+        input("  (press Enter)")
+        return
+
+    rows_input = input("  Seat rows (e.g. A B C) : ").strip().upper().split()
+    if not rows_input:
+        print("\n  At least one row required")
+        input("  (press Enter)")
+        return
+
+    seats_per_row = input("  Seats per row : ").strip()
+    if not seats_per_row.isdigit() or int(seats_per_row) < 1:
+        print("\n  Invalid number")
+        input("  (press Enter)")
+        return
+
+    vip_rows = input("  VIP rows (e.g. A), leave blank for none : ").strip().upper().split()
+
+    show = Show(movie, time)
+    for row in rows_input:
+        for num in range(1, int(seats_per_row) + 1):
+            t = "VIP" if row in vip_rows else "Normal"
+            show.add_seat(Seat(f"{row}{num}", t))
+
+    cinema.add_show(show)
+    cinema._shows.append(show)
+    total = len(rows_input) * int(seats_per_row)
+    print(f"\n  Show added! {movie.movie_name} @ {time} — {total} seats")
+    input("  (press Enter)")
+
+
+def do_search_by_genre(cinema):
+    print_header("SEARCH BY GENRE")
+    genre = input("\n  Genre : ").strip()
+    results = cinema.search_movie_by_type(genre)
+    if results:
+        print(f"\n  Found {len(results)} movie(s):")
+        for m in results:
+            print(f"    - {m}")
+    else:
+        print("\n  No movies found.")
+    input("  (press Enter)")
+
+
+def do_search_by_name(cinema):
+    print_header("SEARCH SHOWTIME")
+    name = input("\n  Movie name : ").strip()
+    results = cinema.search_movie_time_by_movie_name(name)
+    if results:
+        print(f"\n  Showtimes for '{name}':")
+        for t in results:
+            print(f"    - {t}")
+    else:
+        print("\n  No showtimes found.")
+    input("  (press Enter)")
+
+
+# ── User screens ──────────────────────────────────────────────────────────────
+
+def screen_shows(cinema, user):
     while True:
         print_header(f"NOW SHOWING  |  {user.username}")
         print(f"\n  {'No.':<5} {'Time':<8} {'Movie':<26} {'Seats'}")
@@ -136,6 +268,7 @@ def screen_shows(cinema, user): #Shows
             print(f"  {i+1}    {sh.time:<8} {sh.movie.movie_name:<26} {avail}/{total} available")
 
         print("\n  " + "-" * 46)
+        print(f"  S  Search")
         print(f"  T  My Tickets ({len(user.ticket_list)} ticket(s))")
         print("  0  Logout")
         print()
@@ -146,6 +279,8 @@ def screen_shows(cinema, user): #Shows
             return
         elif choice.lower() == "t":
             screen_my_tickets(user)
+        elif choice.lower() == "s":
+            screen_search(cinema)
         elif choice.isdigit() and 1 <= int(choice) <= len(shows):
             screen_seats(user, shows[int(choice) - 1])
         else:
@@ -153,7 +288,28 @@ def screen_shows(cinema, user): #Shows
             input("  (press Enter)")
 
 
-def screen_seats(user, show):#Seats Choosing
+def screen_search(cinema):
+    while True:
+        print_header("SEARCH")
+        print("\n  1  Search movie by genre")
+        print("  2  Search showtime by movie name")
+        print("  0  Back")
+        print()
+
+        choice = input("  Choose : ").strip()
+
+        if choice == "0":
+            return
+        elif choice == "1":
+            do_search_by_genre(cinema)
+        elif choice == "2":
+            do_search_by_name(cinema)
+        else:
+            print("\n  Invalid choice")
+            input("  (press Enter)")
+
+
+def screen_seats(user, show):
     while True:
         print_header(f"{show.movie.movie_name}  @  {show.time}")
 
@@ -176,7 +332,7 @@ def screen_seats(user, show):#Seats Choosing
             for s in rows[row_letter]:
                 if s.is_reserved:
                     print("[X]", end=" ")
-                elif s._Seat__seat_type == "VIP":
+                elif s.seat_type == "VIP":
                     print("[V]", end=" ")
                 else:
                     print("[ ]", end=" ")
@@ -207,7 +363,7 @@ def screen_seats(user, show):#Seats Choosing
         failed  = []
 
         for name in seat_names:
-            found = next((s for s in seats if s._Seat__seat_no == name), None)
+            found = next((s for s in seats if s.seat_no == name), None)
             if not found:
                 failed.append(f"{name} (not found)")
             else:
@@ -240,7 +396,8 @@ def screen_seats(user, show):#Seats Choosing
             print("  Booking cancelled")
             input("  (press Enter)")
 
-def screen_my_tickets(user):#User's Tickets
+
+def screen_my_tickets(user):
     while True:
         print_header(f"MY TICKETS  |  {user.username}")
 
@@ -254,9 +411,9 @@ def screen_my_tickets(user):#User's Tickets
         print(f"\n  {'No.':<5} {'Time':<8} {'Movie':<26} {'Seat':<8} {'Type'}")
         print("  " + "-" * 55)
         for i, t in enumerate(tickets):
-            seat = t._Ticket__seat
+            seat = t.seat
             show = t.show
-            print(f"  {i+1:<5} {show.time:<8} {show.movie.movie_name:<26} {seat._Seat__seat_no:<8} {seat._Seat__seat_type}")
+            print(f"  {i+1:<5} {show.time:<8} {show.movie.movie_name:<26} {seat.seat_no:<8} {seat.seat_type}")
 
         print("\n  " + "-" * 55)
         print("  Enter ticket number to cancel, or 0 to go back")
@@ -268,13 +425,13 @@ def screen_my_tickets(user):#User's Tickets
             return
         elif choice.isdigit() and 1 <= int(choice) <= len(tickets):
             t = tickets[int(choice) - 1]
-            seat = t._Ticket__seat
+            seat = t.seat
             show = t.show
             print(f"\n  Cancel: {show.movie.movie_name} @ {show.time} | Seat {seat._Seat__seat_no}")
             confirm = input("  Are you sure? (y/n) : ").strip().lower()
             if confirm == "y":
                 booking = Booking(user, show)
-                booking._Booking__booked_seats = [seat]
+                booking.booked_seats = [seat]
                 user.cancel_booking_by_show(show, booking)
                 print("  Ticket cancelled.")
             else:
@@ -285,10 +442,16 @@ def screen_my_tickets(user):#User's Tickets
             input("  (press Enter)")
 
 
+# ── Entry point ───────────────────────────────────────────────────────────────
+
 if __name__ == "__main__":
     cinema = setup_cinema()
     while True:
         user = screen_login(cinema)
-        if user:
+        if user is None:
+            print("\n  Goodbye!")
+            break
+        if user.username in cinema._admins:
+            screen_admin(cinema)
+        else:
             screen_shows(cinema, user)
-            
